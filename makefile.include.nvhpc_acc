@@ -1,0 +1,74 @@
+# Default precompiler options
+CPP_OPTIONS = -DHOST=\"LinuxNV\" \
+              -DMPI -DMPI_BLOCK=8000 -Duse_collective \
+              -DscaLAPACK \
+              -DCACHE_SIZE=4000 \
+              -Davoidalloc \
+              -Dvasp6 \
+              -Duse_bse_te \
+              -Dtbdyn \
+              -Dqd_emulate \
+              -Dfock_dblbuf \
+              -D_OPENACC \
+              -DUSENCCL -DUSENCCLP2P
+
+CPP         = nvfortran -Mpreprocess -Mfree -Mextend -E $(CPP_OPTIONS) $*$(FUFFIX)  > $*$(SUFFIX)
+
+# Updated CUDA version to match container
+FC          = mpif90 -acc -gpu=cc60,cc70,cc80,cuda12.3
+FCL         = mpif90 -acc -gpu=cc60,cc70,cc80,cuda12.3 -c++libs
+
+FREE        = -Mfree
+FFLAGS      = -Mbackslash -Mlarge_arrays
+OFLAG       = -fast
+DEBUG       = -Mfree -O0 -traceback
+OBJECTS     = fftmpiw.o fftmpi_map.o fftw3d.o fft3dlib.o
+LLIBS       = -cudalib=cublas,cusolver,cufft,nccl -cuda
+
+# Redefine the standard list of O1 and O2 objects
+SOURCE_O1  := pade_fit.o
+SOURCE_O2  := pead.o
+
+# For what used to be vasp.5.lib
+CPP_LIB     = $(CPP)
+FC_LIB      = nvfortran
+CC_LIB      = nvc -w
+CFLAGS_LIB  = -O
+FFLAGS_LIB  = -O1 -Mfixed
+FREE_LIB    = $(FREE)
+OBJECTS_LIB = linpack_double.o
+
+# For the parser library
+CXX_PARS    = nvc++ --no_warnings
+
+# Target CPU settings
+VASP_TARGET_CPU ?= -tp host
+FFLAGS     += $(VASP_TARGET_CPU)
+
+# NVIDIA HPC SDK path (using environment variable)
+NVROOT      = /opt/nvidia/hpc_sdk/Linux_x86_64/23.11
+
+# QD library settings
+QD          = $(NVROOT)/compilers/extras/qd
+LLIBS      += -L$(QD)/lib -lqdmod -lqd
+INCS       += -I$(QD)/include/qd
+
+# BLAS
+BLAS        = -lblas
+
+# LAPACK
+LAPACK      = -llapack
+
+# scaLAPACK
+SCALAPACK   = -Mscalapack
+LLIBS      += $(SCALAPACK) $(LAPACK) $(BLAS)
+
+# FFTW (using system installation from container)
+LLIBS      += -lfftw3
+INCS       += -I/usr/include
+
+# Software emulation of quadruple precision (mandatory)
+QD          = /opt/nvidia/hpc_sdk/Linux_x86_64/23.11/compilers/extras/qd
+LLIBS      += -L$(QD)/lib -lqdmod -lqd
+INCS       += -I$(QD)/include/qd
+
