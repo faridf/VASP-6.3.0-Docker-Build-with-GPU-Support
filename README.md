@@ -31,7 +31,7 @@ docker run --gpus all -it vasp-gpu:6.3.0
 
 # Run VASP with GPU support
 unset CUDA_VISIBLE_DEVICES
-mpirun -np 1 vasp_std
+mpirun -np 1 --allow-run-as-root vasp_std
 ```
 
 ### To run on CPU only:
@@ -41,7 +41,7 @@ docker run -it vasp-gpu:6.3.0
 
 # Run VASP on CPU only
 export CUDA_VISIBLE_DEVICES=-1
-mpirun -np <number_of_cpu_cores> vasp_std
+mpirun -np <number_of_cpu_cores> --allow-run-as-root vasp_std
 ```
 
 ## Technical Details
