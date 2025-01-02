@@ -75,6 +75,3 @@ If you encounter issues:
 2. Check CUDA installation: `nvcc --version`
 3. Verify library paths: `ldd /opt/vasp/vasp.6.3.0/bin/vasp_std`
 
-## License
-
-The build configuration files are provided under MIT license. VASP itself requires a separate license from the University of Vienna.
